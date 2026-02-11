@@ -9,11 +9,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 
 from .serializers import UserSerializer,  RegisterSerializer
+from .permissions.rbac import HasPermission
 
 # Create your views here.
 
 class UserProfileView(APIView):
-    permission_classes = [IsAuthenticated] # No access without Login
+    permission_classes = [IsAuthenticated, HasPermission] # No access without Login
+    required_permission = "user.view"
 
     def get(self, request):
         serializer = UserSerializer(request.user)

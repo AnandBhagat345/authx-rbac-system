@@ -1,7 +1,21 @@
 from django.contrib import admin
-from .models import User, Role
+from .models import User, Role, Permission 
 
 # Register your models here.
 
-admin.site.register(User)
-admin.site.register(Role)
+@admin.register(Permission)
+class PermissionAdmin(admin.ModelAdmin):
+    list_display = ("id", "code", "description")
+    search_fields = ("code",)
+
+
+@admin.register(Role)
+class RoleAdmin(admin.ModelAdmin):
+    list_display = ("id", "name")
+    filter_horizontal = ("permissions",)
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ("id", "email", "role", "is_active")
+    search_fields = ("email",)

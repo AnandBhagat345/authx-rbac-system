@@ -26,19 +26,21 @@ class UserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+class Permission(models.Model):
+    code = models.CharField(max_length=100, unique=True)
+    description = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.code
+
 
 class Role(models.Model):
-    ADMIN = 'ADMIN'
-    MANAGER = 'MANAGER'
-    USER = 'USER'
-
-    ROLE_CHOICES = [
-        (ADMIN, 'Admin'),
-        (MANAGER, 'Manager'),
-        (USER, 'User'),
-    ]
-
-    name = models.CharField(max_length=20, choices=ROLE_CHOICES, unique=True)
+    name = models.CharField(max_length=50, unique=True)
+    permissions = models.ManyToManyField(
+        Permission,
+        related_name="roles",
+        blank=True
+    )
 
     def __str__(self):
         return self.name
@@ -60,6 +62,21 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
     
     objects = UserManager()
+    
+    
+    
+    def has_permission(self, permission_code: str) -> bool:
+        """
+        Check if user has a specific permission via role
+        """
+        if not self.role:
+            return False
+
+        return self.role.permissions.filter(code=permission_code).exists()
 
     def __str__(self):
         return self.email
+    
+    
+    
+    
