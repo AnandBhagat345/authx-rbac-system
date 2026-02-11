@@ -26,6 +26,7 @@ class UserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+
 class Permission(models.Model):
     code = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255)
@@ -69,9 +70,16 @@ class User(AbstractUser):
         """
         Check if user has a specific permission via role
         """
+
+        # superuser bypass
+        if self.is_superuser:
+            return True
+        
+        # If no role assigned
         if not self.role:
             return False
 
+        # check role permissions
         return self.role.permissions.filter(code=permission_code).exists()
 
     def __str__(self):
