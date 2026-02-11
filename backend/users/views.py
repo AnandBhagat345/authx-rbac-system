@@ -8,8 +8,11 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-from .serializers import UserSerializer,  RegisterSerializer
+from .serializers import UserSerializer,  RegisterSerializer, 
 from .permissions.rbac import HasPermission
+
+from rest_framework.viewsets import ModelViewSet
+from users.models import User
 
 # Create your views here.
 
@@ -58,6 +61,35 @@ class LogoutAPIView(APIView):
                 {"error": "Invalid or expired token"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+            
+
+class UserViewSet(ModelViewSet):
+    """
+    Full CRUD for Users with RBAC enforcement 
+    """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, HasPermission]
+
+    # Permission Mapping
+    permission_map = {
+        "list": "user.view",
+        "retrieve": "user.view",
+        "create": "user.create",
+        "update": "user.update",
+        "partial_update": "user.update",
+        "destroy": "user.delete",
+    }
+
+    def get_permissions(self):
+        """
+        Attach required_permission dynamically based on action
+        """
+        required_permission = self.permission_map.get(self.action)
+        if required_permission:
+            self.required_permission = required_permission
+
+        return super().get_permissions()
 
     
     
