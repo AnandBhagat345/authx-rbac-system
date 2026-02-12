@@ -8,11 +8,12 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-from .serializers import UserSerializer,  RegisterSerializer, 
+from .serializers import UserSerializer,  RegisterSerializer, RoleSerializer, AssignRoleSerializer
 from .permissions.rbac import HasPermission
 
 from rest_framework.viewsets import ModelViewSet
-from users.models import User
+from users.models import User, Role
+from rest_framework.decorators import action
 
 # Create your views here.
 
@@ -73,12 +74,11 @@ class UserViewSet(ModelViewSet):
 
     # Permission Mapping
     permission_map = {
-        "list": "user.view",
-        "retrieve": "user.view",
-        "create": "user.create",
-        "update": "user.update",
-        "partial_update": "user.update",
-        "destroy": "user.delete",
+        "GET": "user.view",
+        "POST": "user.create",
+        "PUT": "user.update",
+        "PATCH": "user.update",
+        "DELETE": "user.delete",
     }
 
     def get_permissions(self):
@@ -90,6 +90,82 @@ class UserViewSet(ModelViewSet):
             self.required_permission = required_permission
 
         return super().get_permissions()
+    
+    @action(detail=True, methods=["put"], url_path="assign-role")
+    def assign_role(self, request, pk=None):
+
+        # Permission check manually
+        if not request.user.is_superuser and (
+            not request.user.role or request.user.role.name != "ADMIN"
+        ):
+            return Response(
+                {"error": "You do not have permission to assign roles."},
+                status=403
+            )
+
+        try:
+            user = self.get_object()
+        except:
+            return Response({"error": "User not found"}, status=404)
+
+        role_id = request.data.get("role_id")
+
+        try:
+            role = Role.objects.get(pk=role_id)
+        except Role.DoesNotExist:
+            return Response({"error": "Role not found"}, status=404)
+
+        user.role = role
+        user.save()
+
+        return Response({"message": "Role assigned successfully"}, status=200)
+    
+    
+class RoleAPIView(APIView):
+
+    permission_classes = [HasPermission]
+
+    permission_map = {
+        "GET": "role.view",
+        "POST": "role.create",
+        "PUT": "role.update",
+        "DELETE": "role.delete",
+    }
+
+    def get(self, request):
+        roles = Role.objects.all()
+        serializer = RoleSerializer(roles, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = RoleSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+    def put(self, request, pk=None):
+        try:
+            role = Role.objects.get(pk=pk)
+        except Role.DoesNotExist:
+            return Response({"error": "Role not found"}, status=404)
+
+        serializer = RoleSerializer(role, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+
+    def delete(self, request, pk=None):
+        try:
+            role = Role.objects.get(pk=pk)
+        except Role.DoesNotExist:
+            return Response({"error": "Role not found"}, status=404)
+
+        role.delete()
+        return Response({"message": "Role deleted successfully"}, status=204)
+
 
     
     

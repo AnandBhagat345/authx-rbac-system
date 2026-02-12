@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Role,User
+from .models import Role,User, Permission
 
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,4 +26,18 @@ class  RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+    
+class RoleSerializer(serializers.ModelSerializer):
+
+    permissions = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Permission.objects.all()
+    )
+
+    class Meta:
+        model = Role
+        fields = ["id", "name", "permissions"]
         
+        
+class AssignRoleSerializer(serializers.Serializer):
+    role_id = serializers.IntegerField()
