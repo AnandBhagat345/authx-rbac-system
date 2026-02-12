@@ -1,14 +1,22 @@
 # Python
-venv/
-backend/venv/
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 
-# Env
+# Virtual Environment
+backend/venv/
+venv/
+
+# Django
+db.sqlite3
+*.log
+
+# Environment variables
 .env
 
 # Node
 node_modules/
 
-# OS
-.DS_Store
+# VS Code
+.vscode/
