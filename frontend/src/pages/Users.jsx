@@ -31,7 +31,7 @@ function Users() {
   const handleRoleChange = async (userId, roleId) => {
     try {
       await api.put(`users/${userId}/assign-role/`, {
-        role: roleId,
+        role_id: roleId,
       });
 
       fetchUsers(); // refresh list

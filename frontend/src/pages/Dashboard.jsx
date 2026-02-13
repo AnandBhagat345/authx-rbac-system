@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import { hasPermission } from "../utils/permissions";
+
 
 
 function Dashboard() {
@@ -29,10 +31,10 @@ function Dashboard() {
       <p>Email: {user.email}</p>
       <p>Role: {user.role ? user.role.name : "No Role"}</p>
 
-      {user.role && user.role.name === "ADMIN" && (
-        <button onClick={() => navigate("/users")}>
+      {hasPermission(user, "role.assign")  && (
+      <button onClick={() => navigate("/users")}>
         Manage Users
-  </button>
+      </button>
 )}
 
     </div>

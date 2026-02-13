@@ -21,7 +21,7 @@ urlpatterns = [
 
     path("roles/<int:pk>/", RoleAPIView.as_view(), name="role-detail"),
 
-    path("users/<int:pk>/assign-role/", UserProfileView.as_view(), name="assign-role"),
+    # path("users/<int:pk>/assign-role/", UserProfileView.as_view(), name="assign-role"),
 
 
 

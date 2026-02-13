@@ -4,10 +4,20 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useNavigate } from "react-router-dom";
 import Users from "./pages/Users";
-
+import { useState, useEffect } from "react";
 
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+
   return (
     <BrowserRouter>
       <Routes>
@@ -16,7 +26,7 @@ function App() {
         <Route
           path="/users"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute user={user} requiredPermission="role.assign">
               <Users />
             </ProtectedRoute>
           }
@@ -26,7 +36,7 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute user={user}>
               <Dashboard />
             </ProtectedRoute>
           }

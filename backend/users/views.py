@@ -75,6 +75,7 @@ class UserViewSet(ModelViewSet):
     # Permission Mapping
     permission_map = {
         "GET": "user.view",
+        
         "POST": "user.create",
         "PUT": "user.update",
         "PATCH": "user.update",
@@ -94,20 +95,15 @@ class UserViewSet(ModelViewSet):
     @action(detail=True, methods=["put"], url_path="assign-role")
     def assign_role(self, request, pk=None):
 
-        # Permission check manually
-        if not request.user.is_superuser and (
-            not request.user.role or request.user.role.name != "ADMIN"
-        ):
+        if not request.user.role or not request.user.role.permissions.filter(
+            code="role.assign"
+        ).exists():
             return Response(
                 {"error": "You do not have permission to assign roles."},
                 status=403
             )
 
-        try:
-            user = self.get_object()
-        except:
-            return Response({"error": "User not found"}, status=404)
-
+        user = self.get_object()
         role_id = request.data.get("role_id")
 
         try:
@@ -119,7 +115,7 @@ class UserViewSet(ModelViewSet):
         user.save()
 
         return Response({"message": "Role assigned successfully"}, status=200)
-    
+
     
 class RoleAPIView(APIView):
 

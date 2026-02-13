@@ -2,9 +2,15 @@ from rest_framework import serializers
 from .models import Role,User, Permission
 
 class RoleSerializer(serializers.ModelSerializer):
+    permissions = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field="code"
+    )
+
     class Meta:
         model = Role
-        fields = ['id', 'name']
+        fields = ["id", "name", "permissions"]
         
 class UserSerializer(serializers.ModelSerializer):
     role = RoleSerializer(read_only=True)
@@ -28,15 +34,16 @@ class  RegisterSerializer(serializers.ModelSerializer):
         return user
     
 class RoleSerializer(serializers.ModelSerializer):
-
-    permissions = serializers.PrimaryKeyRelatedField(
+    permissions = serializers.SlugRelatedField(
         many=True,
-        queryset=Permission.objects.all()
+        read_only=True,
+        slug_field="code"
     )
 
     class Meta:
         model = Role
         fields = ["id", "name", "permissions"]
+
         
         
 class AssignRoleSerializer(serializers.Serializer):
