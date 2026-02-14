@@ -74,22 +74,19 @@ class UserViewSet(ModelViewSet):
 
     # Permission Mapping
     permission_map = {
-        "GET": "user.view",
-        
-        "POST": "user.create",
-        "PUT": "user.update",
-        "PATCH": "user.update",
-        "DELETE": "user.delete",
+    "list": "user.view",
+    "retrieve": "user.view",
+    "create": "user.create",
+    "update": "user.update",
+    "partial_update": "user.update",
+    "destroy": "user.delete",
     }
 
     def get_permissions(self):
         """
         Attach required_permission dynamically based on action
         """
-        required_permission = self.permission_map.get(self.action)
-        if required_permission:
-            self.required_permission = required_permission
-
+        self.required_permission = self.permission_map.get(self.action)
         return super().get_permissions()
     
     @action(detail=True, methods=["put"], url_path="assign-role")
@@ -119,7 +116,7 @@ class UserViewSet(ModelViewSet):
     
 class RoleAPIView(APIView):
 
-    permission_classes = [HasPermission]
+    permission_classes = [IsAuthenticated, HasPermission]
 
     permission_map = {
         "GET": "role.view",

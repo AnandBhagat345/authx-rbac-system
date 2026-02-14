@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route , Navigate} from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -20,28 +20,32 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        
-        <Route
-          path="/users"
-          element={
-            <ProtectedRoute user={user} requiredPermission="role.assign">
-              <Users />
-            </ProtectedRoute>
-          }
-        />
+     <Routes>
+      <Route path="/" element={<Navigate to="/login" />} />
+    
 
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute user={user}>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+      <Route path="/login" element={<Login />} />
+
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute user={user} requiredPermission="role.assign">
+            <Users />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute user={user}>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+
     </BrowserRouter>
   );
 }

@@ -19,6 +19,10 @@ function Login() {
       });
 
       localStorage.setItem("access", res.data.access);
+
+      const userRes = await api.get("users/me/");
+      localStorage.setItem("user", JSON.stringify(userRes.data));
+
       navigate("/dashboard");
       alert("Login Successful "); 
 
