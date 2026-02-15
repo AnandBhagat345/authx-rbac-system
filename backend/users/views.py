@@ -8,11 +8,11 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-from .serializers import UserSerializer,  RegisterSerializer, RoleSerializer, AssignRoleSerializer
+from .serializers import UserSerializer,  RegisterSerializer, RoleSerializer, AssignRoleSerializer,AuditLogSerializer
 from .permissions.rbac import HasPermission
 
-from rest_framework.viewsets import ModelViewSet
-from users.models import User, Role
+from rest_framework.viewsets import ModelViewSet,ReadOnlyModelViewSet
+from users.models import User, Role, AuditLog
 from rest_framework.decorators import action
 
 # Create your views here.
@@ -74,19 +74,22 @@ class UserViewSet(ModelViewSet):
 
     # Permission Mapping
     permission_map = {
-    "list": "user.view",
-    "retrieve": "user.view",
-    "create": "user.create",
-    "update": "user.update",
-    "partial_update": "user.update",
-    "destroy": "user.delete",
+        "GET": "user.view",
+        
+        "POST": "user.create",
+        "PUT": "user.update",
+        "PATCH": "user.update",
+        "DELETE": "user.delete",
     }
 
     def get_permissions(self):
         """
         Attach required_permission dynamically based on action
         """
-        self.required_permission = self.permission_map.get(self.action)
+        required_permission = self.permission_map.get(self.action)
+        if required_permission:
+            self.required_permission = required_permission
+
         return super().get_permissions()
     
     @action(detail=True, methods=["put"], url_path="assign-role")
@@ -110,13 +113,19 @@ class UserViewSet(ModelViewSet):
 
         user.role = role
         user.save()
+        
+        AuditLog.objects.create(
+            actor=request.user,
+            target_user=user,
+            action=f"Assigned role {role.name}"
+        )
 
         return Response({"message": "Role assigned successfully"}, status=200)
 
     
 class RoleAPIView(APIView):
 
-    permission_classes = [IsAuthenticated, HasPermission]
+    permission_classes = [HasPermission]
 
     permission_map = {
         "GET": "role.view",
@@ -160,6 +169,14 @@ class RoleAPIView(APIView):
         return Response({"message": "Role deleted successfully"}, status=204)
 
 
-    
+class AuditLogViewSet(ReadOnlyModelViewSet):
+    queryset = AuditLog.objects.all().order_by("-timestamp")
+    serializer_class = AuditLogSerializer
+    permission_classes = [IsAuthenticated, HasPermission]
+
+    permission_map = {
+        "GET": "audit.view"
+    }
+
     
 

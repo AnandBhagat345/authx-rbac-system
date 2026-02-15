@@ -7,17 +7,30 @@ function Users() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
 
-  // ================= FETCH USERS =================
-  const fetchUsers = async () => {
-    try {
-      const res = await api.get("users/");
-      setUsers(res.data);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [next, setNext] = useState(null);
+  const [previous, setPrevious] = useState(null);
+
+
+  // ---- FETCH USERS ----
+
+  const fetchUsers = async (page = 1) => {
+  try {
+    const res = await api.get(`users/?page=${page}`);
+
+    setUsers(res.data.results);
+    setTotalCount(res.data.count);
+    setNext(res.data.next);
+    setPrevious(res.data.previous);
+    setCurrentPage(page);
+
     } catch (error) {
       console.log("Not allowed ❌");
     }
   };
 
-  // ================= FETCH ROLES =================
+  // ---- FETCH ROLES ----
   const fetchRoles = async () => {
     try {
       const res = await api.get("roles/");
@@ -28,23 +41,30 @@ function Users() {
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchUsers(1);
     fetchRoles();
   }, []);
 
-  // ================= ROLE CHANGE =================
-  const handleRoleChange = async (userId, roleId) => {
+  // ---- ROLE CHANGE ----
+  const handleRoleChange = async (userId, roleId, roleName) => {
+    const confirmChange = window.confirm(
+      `Are you sure you want to assign role "${roleName}" to this user?`
+    );
+
+    if (!confirmChange) return;
+
     try {
       await api.put(`users/${userId}/assign-role/`, {
         role_id: roleId,
       });
+
       fetchUsers();
     } catch (error) {
       console.log("Role update failed");
     }
   };
 
-  // ================= FILTER LOGIC =================
+  // ---- FILTER LOGIC ----
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
       const matchesSearch = u.email
@@ -107,9 +127,19 @@ function Users() {
               <td>
                 <select
                   value={u.role ? u.role.id : ""}
-                  onChange={(e) =>
-                    handleRoleChange(u.id, e.target.value)
-                  }
+                  onChange={(e) => {
+                    const selectedRoleId = parseInt(e.target.value);
+
+                    const selectedRole = roles.find(
+                      (r) => r.id === selectedRoleId
+                    );
+
+                    handleRoleChange(
+                      u.id,
+                      selectedRoleId,
+                      selectedRole ? selectedRole.name : "No Role"
+                    );
+                  }}
                 >
                   <option value="">No Role</option>
                   {roles.map((r) => (
@@ -123,6 +153,27 @@ function Users() {
           ))}
         </tbody>
       </table>
+      <div style={{ marginTop: "20px" }}>
+        <button
+          disabled={!previous}
+          onClick={() => fetchUsers(currentPage - 1)}
+        >
+          Previous
+        </button>
+
+        <span style={{ margin: "0 10px" }}>
+          Page {currentPage}{"/"}{Math.ceil(totalCount / 5)
+}
+        </span>
+
+        <button
+          disabled={!next}
+          onClick={() => fetchUsers(currentPage + 1)}
+        >
+          Next
+        </button>
+      </div>
+
     </div>
   );
 }

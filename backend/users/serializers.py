@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Role,User, Permission
+from .models import Role,User, Permission, AuditLog
 
 class RoleSerializer(serializers.ModelSerializer):
     permissions = serializers.SlugRelatedField(
@@ -48,3 +48,17 @@ class RoleSerializer(serializers.ModelSerializer):
         
 class AssignRoleSerializer(serializers.Serializer):
     role_id = serializers.IntegerField()
+    
+class AuditLogSerializer(serializers.ModelSerializer):
+    actor_email = serializers.CharField(source="actor.email", read_only=True)
+    target_email = serializers.CharField(source="target_user.email", read_only=True)
+
+    class Meta:
+        model = AuditLog
+        fields = [
+            "id",
+            "actor_email",
+            "target_email",
+            "action",
+            "timestamp",
+        ]

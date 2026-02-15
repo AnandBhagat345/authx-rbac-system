@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Role, Permission 
+from .models import User, Role, Permission , AuditLog
 
 # Register your models here.
 
@@ -19,3 +19,8 @@ class RoleAdmin(admin.ModelAdmin):
 class UserAdmin(admin.ModelAdmin):
     list_display = ("id", "email", "role", "is_active")
     search_fields = ("email",)
+
+@admin.register(AuditLog)
+class AuditLogAdmin(admin.ModelAdmin):
+    list_display = ("actor", "target_user", "action", "timestamp")
+    ordering = ("-timestamp",)
