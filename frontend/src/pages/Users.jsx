@@ -1,5 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import api from "../api/axios";
+import "../style/admin.css";
+
 
 function Users() {
   const [users, setUsers] = useState([]);
@@ -80,7 +82,8 @@ function Users() {
   }, [users, search, roleFilter]);
 
   return (
-    <div>
+    <div className="page-container">
+    <div className="card">
       <h2>User Management Panel</h2>
 
       {/* SEARCH + FILTER */}
@@ -107,52 +110,66 @@ function Users() {
       </div>
 
       {/* TABLE */}
-      <table border="1" cellPadding="8">
-        <thead>
-          <tr>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Change Role</th>
-          </tr>
-        </thead>
+      <table className="table">
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
 
-        <tbody>
-          {filteredUsers.map((u) => (
-            <tr key={u.id}>
-              <td>{u.email}</td>
-              <td>{u.role ? u.role.name : "No Role"}</td>
-              <td>{u.is_active ? "Active" : "Inactive"}</td>
+  <tbody>
+    {users.map((u) => (
+      <tr key={u.id}>
+        <td>{u.email}</td>
 
-              <td>
-                <select
-                  value={u.role ? u.role.id : ""}
-                  onChange={(e) => {
-                    const selectedRoleId = parseInt(e.target.value);
+        <td>
+          {u.role ? (
+            <span
+              className={`badge ${
+                u.role.name === "ADMIN"
+                  ? "badge-admin"
+                  : "badge-user"
+              }`}
+            >
+              {u.role.name}
+            </span>
+          ) : (
+            "No Role"
+          )}
+        </td>
 
-                    const selectedRole = roles.find(
-                      (r) => r.id === selectedRoleId
-                    );
+        <td>
+          <select
+            value={u.role ? u.role.id : ""}
+            onChange={(e) => {
+              const selectedRoleId = parseInt(e.target.value);
+              const selectedRole = roles.find(
+                (r) => r.id === selectedRoleId
+              );
 
-                    handleRoleChange(
-                      u.id,
-                      selectedRoleId,
-                      selectedRole ? selectedRole.name : "No Role"
-                    );
-                  }}
-                >
-                  <option value="">No Role</option>
-                  {roles.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.name}
-                    </option>
-                  ))}
-                </select>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              handleRoleChange(
+                u.id,
+                selectedRoleId,
+                selectedRole ? selectedRole.name : "No Role"
+              );
+            }}
+          >
+            <option value="">No Role</option>
+            {roles.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.name}
+              </option>
+            ))}
+          </select>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+      
       <div style={{ marginTop: "20px" }}>
         <button
           disabled={!previous}
@@ -172,6 +189,8 @@ function Users() {
         >
           Next
         </button>
+      </div>
+
       </div>
 
     </div>

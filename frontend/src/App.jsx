@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route , Navigate} from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AuditLogs from "./pages/AuditLogs";
 import { useNavigate } from "react-router-dom";
 import Users from "./pages/Users";
 import { useState, useEffect } from "react";
@@ -44,6 +45,9 @@ function App() {
           </ProtectedRoute>
         }
       />
+      
+      <Route path="/audit-logs" element={<AuditLogs />} />
+
     </Routes>
 
     </BrowserRouter>

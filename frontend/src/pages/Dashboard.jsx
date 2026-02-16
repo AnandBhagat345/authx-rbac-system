@@ -35,7 +35,14 @@ function Dashboard() {
       <button onClick={() => navigate("/users")}>
         Manage Users
       </button>
-)}
+      )}
+      
+      {hasPermission(user, "role.assign")  && (
+      <button onClick={() => navigate("/audit-logs")}>
+        View Audit Logs
+      </button>
+      )}
+
 
     </div>
   );

@@ -1,0 +1,73 @@
+.page-container {
+  padding: 30px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+   width: 100%;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 12px;
+  background-color: #f0f2f5;
+  font-weight: 600;
+}
+
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.badge-admin {
+  background-color: #ffe8e8;
+  color: #c92a2a;
+}
+
+.badge-user {
+  background-color: #e7f5ff;
+  color: #1971c2;
+}
+
+.button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.button-primary {
+  background-color: #4c6ef5;
+  color: white;
+}
+
+.button-danger {
+  background-color: #fa5252;
+  color: white;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
