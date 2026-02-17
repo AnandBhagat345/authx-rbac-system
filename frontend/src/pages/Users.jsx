@@ -171,7 +171,7 @@ function Users() {
 
       
       <div style={{ marginTop: "20px" }}>
-        <button
+        <button className="button button-primary"
           disabled={!previous}
           onClick={() => fetchUsers(currentPage - 1)}
         >
@@ -183,7 +183,7 @@ function Users() {
 }
         </span>
 
-        <button
+        <button className="button button-primary"
           disabled={!next}
           onClick={() => fetchUsers(currentPage + 1)}
         >

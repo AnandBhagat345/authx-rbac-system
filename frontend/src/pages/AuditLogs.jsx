@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import "../style/admin.css";
 
 function AuditLogs() {
   const [logs, setLogs] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [next, setNext] = useState(null);
   const [previous, setPrevious] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchLogs = async (page = 1) => {
     try {
+      setLoading(true);
       const res = await api.get(`audit-logs/?page=${page}`);
 
       setLogs(res.data.results);
@@ -17,6 +20,8 @@ function AuditLogs() {
       setCurrentPage(page);
     } catch (error) {
       console.log("Not allowed ❌");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -26,51 +31,86 @@ function AuditLogs() {
 
   return (
     <div className="page-container">
-    <div className="card">
+      <div className="card">
 
-      <h2>Audit History</h2>
+        <div style={{ marginBottom: "20px" }}>
+          <h2 style={{ marginBottom: "5px" }}>System Audit Logs</h2>
+          <p style={{ color: "#666", fontSize: "14px" }}>
+            Complete history of administrative actions.
+          </p>
+        </div>
 
-      <table border="1" cellPadding="10">
-        <thead>
-          <tr>
-            <th>Actor</th>
-            <th>Target</th>
-            <th>Action</th>
-            <th>Time</th>
-          </tr>
-        </thead>
+        {loading ? (
+          <p>Loading audit history...</p>
+        ) : logs.length === 0 ? (
+          <div style={{ padding: "20px", textAlign: "center", color: "#777" }}>
+            No audit records found.
+          </div>
+        ) : (
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Actor</th>
+                <th>Target</th>
+                <th>Action</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
 
-        <tbody>
-          {logs.map((log) => (
-            <tr key={log.id}>
-              <td>{log.actor_email}</td>
-              <td>{log.target_email}</td>
-              <td>{log.action}</td>
-              <td>{new Date(log.timestamp).toLocaleString()}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+            <tbody>
+              {logs.map((log) => (
+                <tr key={log.id}>
+                  <td>{log.actor_email || "System"}</td>
+                  <td>{log.target_email || "-"}</td>
 
-      <div style={{ marginTop: "20px" }}>
-        <button
-          disabled={!previous}
-          onClick={() => fetchLogs(currentPage - 1)}
-        >
-          Previous
-        </button>
+                  <td>
+                    <span className="badge badge-admin">
+                      {log.action}
+                    </span>
+                  </td>
 
-        <span style={{ margin: "0 10px" }}>
-          Page {currentPage}
-        </span>
+                  <td>
+                    {new Date(log.timestamp).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
 
-        <button
-          disabled={!next}
-          onClick={() => fetchLogs(currentPage + 1)}
-        >
-          Next
-        </button>
-      </div>
+        {/* Pagination */}
+        {!loading && logs.length > 0 && (
+          <div
+            style={{
+              marginTop: "25px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "15px"
+            }}
+          >
+            <button
+              className="button button-primary"
+              disabled={!previous}
+              onClick={() => fetchLogs(currentPage - 1)}
+            >
+              Previous
+            </button>
+
+            <span style={{ fontWeight: "500" }}>
+              Page {currentPage}
+            </span>
+
+            <button
+              className="button button-primary"
+              disabled={!next}
+              onClick={() => fetchLogs(currentPage + 1)}
+            >
+              Next
+            </button>
+          </div>
+        )}
+
       </div>
     </div>
   );

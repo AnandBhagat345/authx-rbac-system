@@ -19,6 +19,7 @@ function Login() {
       });
 
       localStorage.setItem("access", res.data.access);
+      localStorage.setItem("refresh", res.data.refresh);
 
       const userRes = await api.get("users/me/");
       localStorage.setItem("user", JSON.stringify(userRes.data));

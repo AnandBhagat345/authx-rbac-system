@@ -71,3 +71,7 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
