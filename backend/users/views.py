@@ -8,12 +8,21 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-from .serializers import UserSerializer,  RegisterSerializer, RoleSerializer, AssignRoleSerializer,AuditLogSerializer
+from .serializers import UserSerializer,  RegisterSerializer, RoleSerializer, AssignRoleSerializer,AuditLogSerializer,RegisterSerializer
 from .permissions.rbac import HasPermission
 
 from rest_framework.viewsets import ModelViewSet,ReadOnlyModelViewSet
 from users.models import User, Role, AuditLog
 from rest_framework.decorators import action
+
+from rest_framework import status
+from django.contrib.auth import get_user_model
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+from django.conf import settings
+
+from .tokens import email_verification_token
 
 # Create your views here.
 
@@ -179,4 +188,37 @@ class AuditLogViewSet(ReadOnlyModelViewSet):
     }
 
     
+User = get_user_model()
 
+
+class RegisterView(APIView):
+
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+
+        if serializer.is_valid():
+            user = serializer.save()
+
+            # generate uid
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+            # generate token
+            token = email_verification_token.make_token(user)
+
+            # build verification link
+            verification_link = f"http://127.0.0.1:8000/api/auth/verify/{uid}/{token}/"
+
+            # send email (console backend)
+            send_mail(
+                subject="Verify your email",
+                message=f"Click the link to verify your account:\n{verification_link}",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+            )
+
+            return Response(
+                {"message": "User registered successfully. Check your email to verify."},
+                status=status.HTTP_201_CREATED
+            )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
