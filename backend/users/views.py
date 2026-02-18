@@ -21,6 +21,8 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.core.mail import send_mail
 from django.conf import settings
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
 
 from .tokens import email_verification_token
 
@@ -35,19 +37,27 @@ class UserProfileView(APIView):
         return Response(serializer.data)
     
 class RegisterAPIView(generics.CreateAPIView):
-    serializer_class  = RegisterSerializer
+    serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
-    
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+
+    def perform_create(self, serializer):
         user = serializer.save()
 
-        return Response(
-            {
-                "message": "User registered successfully"
-            },
-            status=status.HTTP_201_CREATED
+        # generate uid
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        # generate token
+        token = email_verification_token.make_token(user)
+
+        # build verification link
+        verification_link = f"http://127.0.0.1:8000/api/verify/{uid}/{token}/"
+
+        # send email
+        send_mail(
+            subject="Verify your email",
+            message=f"Click the link to verify your account:\n{verification_link}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
         )
 
 
@@ -188,37 +198,69 @@ class AuditLogViewSet(ReadOnlyModelViewSet):
     }
 
     
-User = get_user_model()
+# User = get_user_model()
 
 
-class RegisterView(APIView):
+# class RegisterView(APIView):
 
-    def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
+#     def post(self, request):
+#         serializer = RegisterSerializer(data=request.data)
 
-        if serializer.is_valid():
-            user = serializer.save()
+#         if serializer.is_valid():
+#             user = serializer.save()
 
-            # generate uid
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
+#             # generate uid
+#             uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-            # generate token
-            token = email_verification_token.make_token(user)
+#             # generate token
+#             token = email_verification_token.make_token(user)
 
-            # build verification link
-            verification_link = f"http://127.0.0.1:8000/api/auth/verify/{uid}/{token}/"
+#             # build verification link
+#             verification_link = f"http://127.0.0.1:8000/api/auth/verify/{uid}/{token}/"
 
-            # send email (console backend)
-            send_mail(
-                subject="Verify your email",
-                message=f"Click the link to verify your account:\n{verification_link}",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
+#             # send email (console backend)
+#             send_mail(
+#                 subject="Verify your email",
+#                 message=f"Click the link to verify your account:\n{verification_link}",
+#                 from_email=settings.DEFAULT_FROM_EMAIL,
+#                 recipient_list=[user.email],
+#             )
+
+#             return Response(
+#                 {"message": "User registered successfully. Check your email to verify."},
+#                 status=status.HTTP_201_CREATED
+#             )
+
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class VerifyEmailView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, uidb64, token):
+        try:
+            # decode user id
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            return Response(
+                {"error": "Invalid verification link"},
+                status=status.HTTP_400_BAD_REQUEST
             )
+
+        # check token
+        if email_verification_token.check_token(user, token):
+            user.is_active = True
+            user.save()
 
             return Response(
-                {"message": "User registered successfully. Check your email to verify."},
-                status=status.HTTP_201_CREATED
+                {"message": "Email verified successfully"},
+                status=status.HTTP_200_OK
             )
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"error": "Token is invalid or expired"},
+            status=status.HTTP_400_BAD_REQUEST
+        )

@@ -1,5 +1,5 @@
 from django.urls import path,include
-from .views import UserProfileView, RegisterAPIView, LogoutAPIView,UserViewSet, RoleAPIView,AuditLogViewSet
+from .views import UserProfileView, RegisterAPIView, LogoutAPIView,UserViewSet, RoleAPIView,AuditLogViewSet, VerifyEmailView
 from rest_framework.routers import DefaultRouter
 
 
@@ -10,7 +10,7 @@ router.register(r"audit-logs", AuditLogViewSet)
 
 urlpatterns = [
     # Auth related
-    path('auth/register/', RegisterAPIView.as_view(), name='register'),
+    path('register/', RegisterAPIView.as_view(), name='register'),
 
     # User related
     path('users/me/', UserProfileView.as_view(), name='user-profile'),
@@ -26,8 +26,12 @@ urlpatterns = [
 
     path("api/", include(router.urls)),
 
-
-
-
+    # path('register/', RegisterView.as_view(), name='register'),
+    path('verify/<uidb64>/<token>/', VerifyEmailView.as_view(), name='verify-email'),
 ]
+
+
+
+
+
 urlpatterns += router.urls
