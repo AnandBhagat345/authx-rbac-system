@@ -2,6 +2,9 @@ from rest_framework import serializers
 from .models import Role,User, Permission, AuditLog
 from django.contrib.auth import get_user_model
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.exceptions import AuthenticationFailed
+
 class RoleSerializer(serializers.ModelSerializer):
     permissions = serializers.SlugRelatedField(
         many=True,
@@ -77,3 +80,14 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
+
+        
+class LoginSerializer(TokenObtainPairSerializer):
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        if not self.user.is_active:
+                raise AuthenticationFailed("Email is not verified.")
+
+        return data    

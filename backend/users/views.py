@@ -8,7 +8,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-from .serializers import UserSerializer,  RegisterSerializer, RoleSerializer, AssignRoleSerializer,AuditLogSerializer,RegisterSerializer
+from .serializers import UserSerializer,  RegisterSerializer, RoleSerializer, AssignRoleSerializer,AuditLogSerializer,LoginSerializer
 from .permissions.rbac import HasPermission
 
 from rest_framework.viewsets import ModelViewSet,ReadOnlyModelViewSet
@@ -25,6 +25,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 
 from .tokens import email_verification_token
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 # Create your views here.
 
@@ -264,3 +265,8 @@ class VerifyEmailView(APIView):
             {"error": "Token is invalid or expired"},
             status=status.HTTP_400_BAD_REQUEST
         )
+        
+        
+class LoginAPIView(TokenObtainPairView):
+    serializer_class = LoginSerializer
+    permission_classes = [AllowAny]

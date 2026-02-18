@@ -1,5 +1,5 @@
 from django.urls import path,include
-from .views import UserProfileView, RegisterAPIView, LogoutAPIView,UserViewSet, RoleAPIView,AuditLogViewSet, VerifyEmailView
+from .views import UserProfileView, RegisterAPIView, LogoutAPIView,UserViewSet, RoleAPIView,AuditLogViewSet, VerifyEmailView,LoginAPIView
 from rest_framework.routers import DefaultRouter
 
 
@@ -24,10 +24,11 @@ urlpatterns = [
 
     # path("users/<int:pk>/assign-role/", UserProfileView.as_view(), name="assign-role"),
 
-    path("api/", include(router.urls)),
-
     # path('register/', RegisterView.as_view(), name='register'),
     path('verify/<uidb64>/<token>/', VerifyEmailView.as_view(), name='verify-email'),
+
+    path('auth/login/', LoginAPIView.as_view(), name='login'),
+
 ]
 
 
