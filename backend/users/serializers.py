@@ -91,3 +91,23 @@ class LoginSerializer(TokenObtainPairSerializer):
                 raise AuthenticationFailed("Email is not verified.")
 
         return data    
+    
+    
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+
+        if not User.objects.filter(email=email).exists():
+            raise serializers.ValidationError("User with this email does not exist.")
+
+        return attrs
+    
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    new_password = serializers.CharField(write_only=True)
