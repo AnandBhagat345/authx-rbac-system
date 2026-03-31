@@ -60,7 +60,7 @@ function Users() {
         role_id: roleId,
       });
 
-      fetchUsers();
+      fetchUsers(currentPage);
     } catch (error) {
       console.log("Role update failed");
     }
@@ -120,7 +120,7 @@ function Users() {
   </thead>
 
   <tbody>
-    {users.map((u) => (
+    {filteredUsers.map((u) => (
       <tr key={u.id}>
         <td>{u.email}</td>
 

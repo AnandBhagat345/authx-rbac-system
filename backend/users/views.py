@@ -12,7 +12,7 @@ from .serializers import UserSerializer,  RegisterSerializer, RoleSerializer, As
 from .permissions.rbac import HasPermission
 
 from rest_framework.viewsets import ModelViewSet,ReadOnlyModelViewSet
-from users.models import User, Role, AuditLog
+from users.models import User, Role, AuditLog,OTP
 from rest_framework.decorators import action
 
 from rest_framework import status
@@ -25,9 +25,11 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 
 from .tokens import email_verification_token
-from rest_framework_simplejwt.views import TokenObtainPairView
 
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.contrib.auth import authenticate
+
+from .utils import generate_otp
 
 # Create your views here.
 
@@ -269,13 +271,84 @@ class VerifyEmailView(APIView):
         )
         
         
-class LoginAPIView(TokenObtainPairView):
-    serializer_class = LoginSerializer
+class LoginAPIView(APIView):
     permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get("email")
+        password = request.data.get("password")
+
+        user = authenticate(username=email, password=password)
+
+        if user is None:
+            return Response({"error": "Invalid credentials"}, status=400)
+
+        if not user.is_active:
+            return Response({"error": "Email not verified"}, status=400)
+
+        if user.role  and user.role.name.lower() in ["admin", "manager"]:
+            
+            otp_code = generate_otp()
+            OTP.objects.create(user=user, code=otp_code)
+
+            # Abhi SMS nahi bhej rahe, console print
+            print(f"OTP for {user.phone_number}: {otp_code}")
+
+            return Response({
+                "message": "OTP sent to your phone",
+                "user_id": user.id
+            })
+        
+        else:
+            #  Normal user - direct JWT
+            refresh = RefreshToken.for_user(user)
+
+            return Response({
+                "access": str(refresh.access_token),
+                "refresh": str(refresh)
+            })
+
+
+
+class VerifyOTPAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        user_id = request.data.get("user_id")
+        otp_input = request.data.get("otp")
+
+        try:
+            user = User.objects.get(id=user_id)
+            otp = OTP.objects.filter(
+                user=user,
+                code=otp_input,
+                is_verified=False
+            ).last()
+
+            if not otp:
+                return Response({"error": "Invalid OTP"}, status=400)
+
+            if otp.is_expired():
+                return Response({"error": "OTP expired"}, status=400)
+
+            otp.is_verified = True
+            otp.save()
+
+            refresh = RefreshToken.for_user(user)
+
+            return Response({
+                "access": str(refresh.access_token),
+                "refresh": str(refresh)
+            })
+
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=404)
+    
+    
+    
     
     
 password_reset_token = PasswordResetTokenGenerator()
-
 
 class PasswordResetRequestAPIView(APIView):
     permission_classes = [AllowAny]

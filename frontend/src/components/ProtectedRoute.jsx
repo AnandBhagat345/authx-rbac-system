@@ -9,16 +9,20 @@ const ProtectedRoute = ({
 }) => {
 
   if (loading) {
-    return <h2 style={{ padding: "30px" }}>Loading...</h2>;
+    return <h2 style={{ padding: "30px", textAlign: "center"}}>Loading...</h2>;
   }
 
   if (!user) {
     return <Navigate to="/login" />;
   }
 
-  if (requiredPermission && !hasPermission(user, requiredPermission)) {
+  if (
+  requiredPermission &&
+  (!user.role || !hasPermission(user, requiredPermission))
+  ) {
     return <Navigate to="/dashboard" />;
   }
+   
 
   return children;
 };

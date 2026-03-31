@@ -18,9 +18,15 @@ function AuditLogs() {
       setNext(res.data.next);
       setPrevious(res.data.previous);
       setCurrentPage(page);
+
     } catch (error) {
-      console.log("Not allowed ❌");
-    } finally {
+      if (error.response?.status === 403) {
+        alert("You do not have permission to view audit logs.");
+      } else {
+        alert("Failed to load audit logs.");
+      }
+    }
+     finally {
       setLoading(false);
     }
   };
@@ -41,7 +47,7 @@ function AuditLogs() {
         </div>
 
         {loading ? (
-          <p>Loading audit history...</p>
+          <p style={{ textAlign: "center" }}>Loading audit history...</p>
         ) : logs.length === 0 ? (
           <div style={{ padding: "20px", textAlign: "center", color: "#777" }}>
             No audit records found.

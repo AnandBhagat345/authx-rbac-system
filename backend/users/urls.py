@@ -1,5 +1,5 @@
 from django.urls import path,include
-from .views import UserProfileView, RegisterAPIView, LogoutAPIView,UserViewSet,RoleAPIView,AuditLogViewSet, VerifyEmailView,LoginAPIView,PasswordResetRequestAPIView,PasswordResetConfirmAPIView
+from .views import UserProfileView, RegisterAPIView, LogoutAPIView,UserViewSet,RoleAPIView,AuditLogViewSet, VerifyEmailView,LoginAPIView,PasswordResetRequestAPIView,PasswordResetConfirmAPIView,VerifyOTPAPIView
 from rest_framework.routers import DefaultRouter
 
 
@@ -29,13 +29,11 @@ urlpatterns = [
 
     path('auth/login/', LoginAPIView.as_view(), name='login'),
 
+    path("auth/verify-otp/", VerifyOTPAPIView.as_view(), name="verify-otp"),
+
     path('password-reset/', PasswordResetRequestAPIView.as_view(), name='password-reset'),
 
-    path(
-    'password-reset-confirm/<uidb64>/<token>/',
-    PasswordResetConfirmAPIView.as_view(),
-    name='password-reset-confirm'
-),
+    path('password-reset-confirm/<uidb64>/<token>/',PasswordResetConfirmAPIView.as_view(),name='password-reset-confirm'),
 
 
 ]

@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
 
 # Create your models here.
 
@@ -53,7 +55,9 @@ class Role(models.Model):
 class User(AbstractUser):
     username = None  # we don't want username
     email = models.EmailField(unique=True)
-
+    phone_number = models.CharField(max_length=15, unique=True)
+    is_phone_verified = models.BooleanField(default=False)
+    
     role = models.ForeignKey(
         Role,
         on_delete=models.PROTECT,
@@ -66,7 +70,6 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
     
     objects = UserManager()
-    
     
     
     def has_permission(self, permission_code: str) -> bool:
@@ -87,6 +90,16 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+    
+    
+class OTP(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_verified = models.BooleanField(default=False)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timedelta(minutes=5)
     
     
 class AuditLog(models.Model):
