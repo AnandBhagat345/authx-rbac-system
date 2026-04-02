@@ -1,0 +1,93 @@
+# AuthX RBAC System
+
+A Role Based Access Control (RBAC) system built with Django REST Framework and React.
+
+This project demonstrates secure authentication, role assignment, permission control, and audit logging for administrative systems.
+
+---
+
+## Features
+
+* JWT Authentication (Login / Refresh Token)
+* Role Based Access Control (RBAC)
+* Permission Protected Routes
+* User Management Panel
+* Role Assignment by Admin
+* Audit Logs for Administrative Actions
+* Search and Filter Users
+* Pagination Support
+
+---
+
+## Tech Stack
+
+### Backend
+
+* Django
+* Django REST Framework
+* Simple JWT
+* CORS Headers
+
+### Frontend
+
+* React
+* Axios
+* React Router
+
+---
+
+## Project Setup
+
+### Backend
+
+```bash
+cd backend
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## Default Access
+
+Admin users can:
+
+* Assign roles
+* View all users
+* View audit logs
+
+Normal users have restricted access based on assigned permissions.
+
+---
+
+## API Highlights
+
+* `/api/auth/login/`
+* `/api/auth/token/refresh/`
+* `/api/users/`
+* `/api/roles/`
+* `/api/audit-logs/`
+
+---
+
+## Key Learning Outcomes
+
+* Secure token handling
+* Permission based frontend rendering
+* Backend authorization control
+* Audit trail implementation
+
+---
+
+## Author
+
+Paarth
