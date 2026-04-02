@@ -72,7 +72,7 @@ function App() {
         <Route
           path="/users"
           element={
-            <ProtectedRoute user={user} requiredPermission="role.assign">
+            <ProtectedRoute user={user} requiredPermission="user.view">
               <Users />
             </ProtectedRoute>
           }

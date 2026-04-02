@@ -14,6 +14,8 @@ function Users() {
   const [next, setNext] = useState(null);
   const [previous, setPrevious] = useState(null);
 
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+
 
   // ---- FETCH USERS ----
 
@@ -141,29 +143,33 @@ function Users() {
         </td>
 
         <td>
-          <select
-            value={u.role ? u.role.id : ""}
-            onChange={(e) => {
-              const selectedRoleId = parseInt(e.target.value);
-              const selectedRole = roles.find(
-                (r) => r.id === selectedRoleId
-              );
+  {currentUser?.role?.name === "ADMIN" ? (
+    <select
+      value={u.role ? u.role.id : ""}
+      onChange={(e) => {
+        const selectedRoleId = parseInt(e.target.value);
+        const selectedRole = roles.find(
+          (r) => r.id === selectedRoleId
+        );
 
-              handleRoleChange(
-                u.id,
-                selectedRoleId,
-                selectedRole ? selectedRole.name : "No Role"
-              );
-            }}
-          >
-            <option value="">No Role</option>
-            {roles.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.name}
-              </option>
-            ))}
-          </select>
-        </td>
+        handleRoleChange(
+          u.id,
+          selectedRoleId,
+          selectedRole ? selectedRole.name : "No Role"
+        );
+      }}
+    >
+      <option value="">No Role</option>
+      {roles.map((r) => (
+        <option key={r.id} value={r.id}>
+          {r.name}
+        </option>
+      ))}
+    </select>
+  ) : (
+    <span>View Only</span>
+  )}
+</td>
       </tr>
     ))}
   </tbody>

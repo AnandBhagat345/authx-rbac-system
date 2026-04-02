@@ -23,7 +23,9 @@ function Dashboard() {
 
   if (!user) return <h2 style={{ padding: "30px" }}>Loading...</h2>;
 
-  const isAdmin = hasPermission(user, "role.assign");
+const canViewUsers = hasPermission(user, "user.view");
+const canViewAudit = hasPermission(user, "audit.view");
+const canAssignRole = hasPermission(user, "role.assign");
 
   return (
     <div className="page-container">
@@ -48,29 +50,35 @@ function Dashboard() {
         </p>
       </div>
 
-      {isAdmin && (
-        <div className="card">
-          <h2>Admin Controls</h2>
+      {(canViewUsers || canViewAudit) && (
+  <div className="card">
+    <h2>Access Controls</h2>
 
-          <div style={{ display: "flex", gap: "15px", marginTop: "15px" }}>
-            <button
-              className="button button-primary"
-              onClick={() => navigate("/users")}
-            >
-              Manage Users
-            </button>
+    <div style={{ display: "flex", gap: "15px", marginTop: "15px" }}>
 
-            <button
-              className="button button-primary"
-              onClick={() => navigate("/audit-logs")}
-            >
-              View Audit Logs
-            </button>
-          </div>
-        </div>
+      {canViewUsers && (
+        <button
+          className="button button-primary"
+          onClick={() => navigate("/users")}
+        >
+          All Users
+        </button>
       )}
 
-      {!isAdmin && (
+      {canViewAudit && (
+        <button
+          className="button button-primary"
+          onClick={() => navigate("/audit-logs")}
+        >
+          View Audit Logs
+        </button>
+      )}
+
+    </div>
+  </div>
+)}
+
+      {!canViewUsers && !canViewAudit && (
         <div className="card">
           <h2>Your Access</h2>
           <p>
