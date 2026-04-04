@@ -36,17 +36,6 @@ class  RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
-    
-class RoleSerializer(serializers.ModelSerializer):
-    permissions = serializers.SlugRelatedField(
-        many=True,
-        read_only=True,
-        slug_field="code"
-    )
-
-    class Meta:
-        model = Role
-        fields = ["id", "name", "permissions"]
 
         
         
