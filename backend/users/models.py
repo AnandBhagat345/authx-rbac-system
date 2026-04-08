@@ -55,7 +55,8 @@ class Role(models.Model):
 class User(AbstractUser):
     username = None  # we don't want username
     email = models.EmailField(unique=True)
-    phone_number = models.CharField(max_length=15, unique=True)
+    phone_number = models.CharField(max_length=15, unique=True,  null=True,
+    blank=True)
     is_phone_verified = models.BooleanField(default=False)
     
     role = models.ForeignKey(
