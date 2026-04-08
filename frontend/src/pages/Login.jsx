@@ -3,7 +3,7 @@ import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import "../style/login.css";
 
-function Login() {
+function Login({setUser }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -23,6 +23,7 @@ function Login() {
 
       const userRes = await api.get("users/me/");
       localStorage.setItem("user", JSON.stringify(userRes.data));
+      setUser(userRes.data);
 
       navigate("/dashboard");
 
@@ -54,9 +55,22 @@ function Login() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
+         <p
+        style={{ cursor: "pointer", marginTop: "-10px", color: "blue" }}
+        onClick={() => navigate("/forgot-password")}
+      >
+        Forgot Password?
+      </p>
+
         <button className="login-button" onClick={handleLogin}>
           Login
         </button>
+
+      
+      <p 
+      onClick={() => navigate("/register")}>Don't have an account? 
+       <button style={{ cursor: "pointer", color: "blue" }}> Register</button>
+    </p>
       </div>
     </div>
   );

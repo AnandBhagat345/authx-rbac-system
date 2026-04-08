@@ -7,6 +7,9 @@ import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
 import AuditLogs from "./pages/AuditLogs";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Register from "./pages/Register";
 
 function App() {
 
@@ -59,6 +62,11 @@ function App() {
         <Route path="/" element={<Navigate to="/login" />} />
 
         <Route path="/login" element={<Login setUser={setUser} />} />
+
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
+
+        <Route path="/register" element={<Register />} />
 
         <Route
           path="/dashboard"
