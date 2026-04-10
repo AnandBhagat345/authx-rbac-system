@@ -23,12 +23,35 @@ function Dashboard() {
 
   if (!user) return <h2 style={{ padding: "30px" }}>Loading...</h2>;
 
+  const handleLogout = async () => {
+  try {
+    const refresh = localStorage.getItem("refresh");
+
+    await api.post("auth/logout/", {
+      refresh,
+    });
+
+    localStorage.clear();
+    navigate("/login");
+
+  } catch (error) {
+    console.log("Logout error");
+    localStorage.clear();
+    navigate("/login");
+  }
+};
+
 const canViewUsers = hasPermission(user, "user.view");
 const canViewAudit = hasPermission(user, "audit.view");
 const canAssignRole = hasPermission(user, "role.assign");
 
   return (
     <div className="page-container">
+    <div className="top-bar">
+  <button className="button button-danger" onClick={handleLogout}>
+    Logout
+  </button>
+</div>
       <div className="card">
         <h1>Welcome Back 👋</h1>
         <p><strong>Email:</strong> {user.email}</p>
@@ -49,6 +72,8 @@ const canAssignRole = hasPermission(user, "role.assign");
           )}
         </p>
       </div>
+
+      
 
       {(canViewUsers || canViewAudit) && (
   <div className="card">

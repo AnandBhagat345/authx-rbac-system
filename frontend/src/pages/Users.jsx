@@ -34,7 +34,7 @@ function Users() {
     }
   };
 
-  // ---- FETCH ROLES ----
+  //  FETCH ROLES 
   const fetchRoles = async () => {
     try {
       const res = await api.get("roles/");
@@ -49,7 +49,7 @@ function Users() {
     fetchRoles();
   }, []);
 
-  // ---- ROLE CHANGE ----
+  // ROLE CHANGE 
   const handleRoleChange = async (userId, roleId, roleName) => {
     const confirmChange = window.confirm(
       `Are you sure you want to assign role "${roleName}" to this user?`
@@ -68,7 +68,7 @@ function Users() {
     }
   };
 
-  // ---- FILTER LOGIC ----
+  // - FILTER LOGIC -
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
       const matchesSearch = u.email

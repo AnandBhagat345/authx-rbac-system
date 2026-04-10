@@ -23,7 +23,7 @@ function Register() {
       }, 2000);
 
     } catch (error) {
-      setMessage("Registration failed");
+      setMessage("Registration failed (Check your email format or use a stronger password)");
       console.log(error.response?.data);
     }
   };
