@@ -103,7 +103,6 @@ npm run dev
 ## Future Improvements
 
 * Swagger API Documentation
-* Backend Unit Testing
 * Docker Deployment
 * Role Analytics Dashboard
 * Activity Notifications

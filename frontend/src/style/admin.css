@@ -84,3 +84,50 @@
   padding-right: 10px;
   box-sizing: border-box;
 }
+
+
+.layout {
+  display: flex;
+}
+
+.sidebar {
+  width: 220px;
+  background: #1e293b;
+  color: white;
+  height: 100vh;
+  padding: 20px;
+}
+
+.sidebar li {
+  cursor: pointer;
+  margin: 15px 0;
+}
+
+.main {
+  flex: 1;
+  padding: 20px;
+  background: #f1f5f9;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.actions button {
+  margin-right: 10px;
+}

@@ -3,6 +3,7 @@ import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import { hasPermission } from "../utils/permissions";
 import "../style/admin.css";
+import Layout from "../components/Layout";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -45,75 +46,79 @@ const canViewUsers = hasPermission(user, "user.view");
 const canViewAudit = hasPermission(user, "audit.view");
 const canAssignRole = hasPermission(user, "role.assign");
 
-  return (
-    <div className="page-container">
-    <div className="top-bar">
-  <button className="button button-danger" onClick={handleLogout}>
-    Logout
-  </button>
-</div>
-      <div className="card">
-        <h1>Welcome Back 👋</h1>
-        <p><strong>Email:</strong> {user.email}</p>
+const permissions = {
+  canViewUsers,
+  canViewAudit,
+  canAssignRole,
+};
+
+return (
+  <Layout user={user} handleLogout={handleLogout} permissions={permissions}>
+    
+    {/* STATS SECTION */}
+    <div className="stats">
+      <div className="stat-card">
+        <h3>👤 Role</h3>
+        <p>{user.role?.name || "No Role"}</p>
+      </div>
+
+      <div className="stat-card">
+        <h3>🔐 Permissions</h3>
         <p>
-          <strong>Role:</strong>{" "}
-          {user.role ? (
-            <span
-              className={`badge ${
-                user.role.name === "ADMIN"
-                  ? "badge-admin"
-                  : "badge-user"
-              }`}
-            >
-              {user.role.name}
-            </span>
-          ) : (
-            "No Role"
-          )}
+          {[
+            canViewUsers && "Users",
+            canViewAudit && "Audit",
+            canAssignRole && "Assign",
+          ]
+            .filter(Boolean)
+            .join(", ") || "Limited"}
         </p>
       </div>
 
-      
+      <div className="stat-card">
+        <h3>📅 Status</h3>
+        <p>Active</p>
+      </div>
 
-      {(canViewUsers || canViewAudit) && (
-  <div className="card">
-    <h2>Access Controls</h2>
-
-    <div style={{ display: "flex", gap: "15px", marginTop: "15px" }}>
-
-      {canViewUsers && (
-        <button
-          className="button button-primary"
-          onClick={() => navigate("/users")}
-        >
-          All Users
-        </button>
-      )}
-
-      {canViewAudit && (
-        <button
-          className="button button-primary"
-          onClick={() => navigate("/audit-logs")}
-        >
-          View Audit Logs
-        </button>
-      )}
-
+      <div className="stat-card">
+        <h3>🛡 Access Level</h3>
+        <p>
+          {user.role?.name === "ADMIN" ? "High" : "Restricted"}
+        </p>
+      </div>
     </div>
-  </div>
-)}
 
-      {!canViewUsers && !canViewAudit && (
-        <div className="card">
-          <h2>Your Access</h2>
-          <p>
-            You have limited access based on your assigned role.
-            Contact admin if you need additional permissions.
-          </p>
-        </div>
-      )}
+    {/* ACTIONS */}
+    <div className="card">
+      <h2>Quick Actions</h2>
+
+      <div className="actions">
+        {canViewUsers && (
+          <button onClick={() => navigate("/users")}>
+            👥 Manage Users
+          </button>
+        )}
+
+        {canViewAudit && (
+          <button onClick={() => navigate("/audit-logs")}>
+            📊 View Audit Logs
+          </button>
+        )}
+      </div>
     </div>
-  );
+
+    {/* ACTIVITY */}
+    <div className="card">
+      <h2>Recent Activity</h2>
+      <ul>
+        <li>Assigned role to user</li>
+        <li>User logged in</li>
+        <li>Password reset requested</li>
+      </ul>
+    </div>
+
+  </Layout>
+);
 }
 
 export default Dashboard;
