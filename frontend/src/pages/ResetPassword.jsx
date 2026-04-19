@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../api/axios";
+import "../style/auth.css";
 
 function ResetPassword() {
   const { uid, token } = useParams();
@@ -26,22 +27,27 @@ function ResetPassword() {
     }
   };
 
-  return (
-    <div>
-      <h2>Reset Password</h2>
+ return (
+  <div className="auth-page">
+    <div className="auth-card">
+      <h2 className="auth-title">Reset Password</h2>
 
       <input
         type="password"
         placeholder="New Password"
+        className="auth-input"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <button onClick={handleReset}>Reset Password</button>
+      <button className="auth-button" onClick={handleReset}>
+        Reset Password
+      </button>
 
-      {message && <p>{message}</p>}
+      {message && <p className="auth-message">{message}</p>}
     </div>
-  );
+  </div>
+);
 }
 
 export default ResetPassword;

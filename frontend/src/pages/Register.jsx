@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import "../style/auth.css";
 
 function Register() {
   const [email, setEmail] = useState("");
@@ -28,13 +29,15 @@ function Register() {
     }
   };
 
-  return (
-    <div>
-      <h2>Register</h2>
+return (
+  <div className="auth-page">
+    <div className="auth-card">
+      <h2 className="auth-title">Register</h2>
 
       <input
         type="email"
         placeholder="Email"
+        className="auth-input"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
@@ -42,15 +45,19 @@ function Register() {
       <input
         type="password"
         placeholder="Password"
+        className="auth-input"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <button onClick={handleRegister}>Register</button>
+      <button className="auth-button" onClick={handleRegister}>
+        Register
+      </button>
 
-      {message && <p>{message}</p>}
+      {message && <p className="auth-message">{message}</p>}
     </div>
-  );
+  </div>
+);
 }
 
 export default Register;
