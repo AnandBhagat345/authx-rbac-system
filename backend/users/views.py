@@ -202,43 +202,6 @@ class AuditLogViewSet(ReadOnlyModelViewSet):
         "GET": "audit.view"
     }
 
-    
-# User = get_user_model()
-
-
-# class RegisterView(APIView):
-
-#     def post(self, request):
-#         serializer = RegisterSerializer(data=request.data)
-
-#         if serializer.is_valid():
-#             user = serializer.save()
-
-#             # generate uid
-#             uid = urlsafe_base64_encode(force_bytes(user.pk))
-
-#             # generate token
-#             token = email_verification_token.make_token(user)
-
-#             # build verification link
-#             verification_link = f"http://127.0.0.1:8000/api/auth/verify/{uid}/{token}/"
-
-#             # send email (console backend)
-#             send_mail(
-#                 subject="Verify your email",
-#                 message=f"Click the link to verify your account:\n{verification_link}",
-#                 from_email=settings.DEFAULT_FROM_EMAIL,
-#                 recipient_list=[user.email],
-#             )
-
-#             return Response(
-#                 {"message": "User registered successfully. Check your email to verify."},
-#                 status=status.HTTP_201_CREATED
-#             )
-
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 class VerifyEmailView(APIView):
     permission_classes = [AllowAny]
