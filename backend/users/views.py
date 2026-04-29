@@ -89,9 +89,7 @@ class LogoutAPIView(APIView):
             
 
 class UserViewSet(ModelViewSet):
-    """
-    Full CRUD for Users with RBAC enforcement 
-    """
+    
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, HasPermission]

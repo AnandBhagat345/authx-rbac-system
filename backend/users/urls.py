@@ -25,6 +25,7 @@ urlpatterns = [
     # path("users/<int:pk>/assign-role/", UserProfileView.as_view(), name="assign-role"),
 
     # path('register/', RegisterView.as_view(), name='register'),
+    
     path('verify/<uidb64>/<token>/', VerifyEmailView.as_view(), name='verify-email'),
 
     path('auth/login/', LoginAPIView.as_view(), name='login'),
