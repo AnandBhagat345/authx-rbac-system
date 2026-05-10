@@ -3,15 +3,20 @@ import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import "../style/login.css";
 
-function Login({setUser }) {
+function Login({ setUser }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  // NEW STATE
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
       setError("");
+      setLoading(true); // start loading
 
       const res = await api.post("auth/token/", {
         email,
@@ -23,12 +28,15 @@ function Login({setUser }) {
 
       const userRes = await api.get("users/me/");
       localStorage.setItem("user", JSON.stringify(userRes.data));
+
       setUser(userRes.data);
 
       navigate("/dashboard");
 
     } catch (error) {
       setError("Invalid email or password");
+    } finally {
+      setLoading(false); // stop loading
     }
   };
 
@@ -55,22 +63,35 @@ function Login({setUser }) {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-         <p
-        style={{ cursor: "pointer", marginTop: "-10px", color: "blue" }}
-        onClick={() => navigate("/forgot-password")}
-      >
-        Forgot Password?
-      </p>
+        <p
+          style={{
+            cursor: "pointer",
+            marginTop: "-10px",
+            color: "blue",
+          }}
+          onClick={() => navigate("/forgot-password")}
+        >
+          Forgot Password?
+        </p>
 
-        <button className="login-button" onClick={handleLogin}>
-          Login
+        <button
+          className="login-button"
+          onClick={handleLogin}
+          disabled={loading}
+          style={{
+            cursor: loading ? "not-allowed" : "pointer",
+            opacity: loading ? 0.7 : 1,
+          }}
+        >
+          {loading ? "Logging in..." : "Login"}
         </button>
 
-      
-      <p 
-      onClick={() => navigate("/register")}>Don't have an account? 
-       <button style={{ cursor: "pointer", color: "blue" }}> Register</button>
-    </p>
+        <p onClick={() => navigate("/register")}>
+          Don't have an account?
+          <button style={{ cursor: "pointer", color: "blue" }}>
+            Register
+          </button>
+        </p>
       </div>
     </div>
   );
