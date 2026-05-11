@@ -147,7 +147,7 @@ class UserViewSet(ModelViewSet):
     
 class RoleAPIView(APIView):
 
-    permission_classes = [HasPermission]
+    permission_classes = [IsAuthenticated,HasPermission]
 
     permission_map = {
         "GET": "role.view",
@@ -242,7 +242,7 @@ class LoginAPIView(APIView):
         user = authenticate(username=email, password=password)
 
         if user is None:
-            return Response({"error": "Invalid credentials"}, status=400)
+            return Response({"error": "Invalid credentials"}, status=401)
 
         if not user.is_active:
             return Response({"error": "Email not verified"}, status=400)
