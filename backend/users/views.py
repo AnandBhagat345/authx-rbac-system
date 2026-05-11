@@ -31,6 +31,8 @@ from django.contrib.auth import authenticate
 
 from .utils import generate_otp
 
+from django.conf import settings
+
 # Create your views here.
 
 class UserProfileView(APIView):
@@ -55,8 +57,7 @@ class RegisterAPIView(generics.CreateAPIView):
         token = email_verification_token.make_token(user)
 
         # build verification link
-        verification_link = f"http://127.0.0.1:8000/api/verify/{uid}/{token}/"
-
+        verification_link = f"{settings.BACKEND_URL}/api/verify/{uid}/{token}/"
         # send email
         send_mail(
             subject="Verify your email",
@@ -324,7 +325,7 @@ class PasswordResetRequestAPIView(APIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = password_reset_token.make_token(user)
 
-            reset_link = f"http://localhost:5173/reset-password/{uid}/{token}"
+            reset_link = f"{settings.FRONTEND_URL}/reset-password/{uid}/{token}"
 
             send_mail(
                 subject="Reset Your Password",
